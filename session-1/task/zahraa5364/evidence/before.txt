@@ -1,0 +1,18 @@
+The server ran in MODE=before.
+The main thread was blocked for approximately 20 seconds per job.
+
+Observed block:
+block:start 2026-10-29T06:23:40.793Z
+block:end   2026-10-29T06:24:00.795Z
+elapsedMs=20000
+
+Event-loop delay observations:
+event-loop max delay: 20015.22 ms
+event-loop max delay: 20048.77 ms
+event-loop max delay: 20032.00 ms
+
+Probe results:
+Requests completed: 343
+Fastest: 1.02 ms
+Slowest: 19901.52 ms
+Average: 3857.00 ms

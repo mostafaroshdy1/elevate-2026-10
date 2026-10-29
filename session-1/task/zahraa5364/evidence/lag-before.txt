@@ -1,0 +1,12 @@
+@"
+Test: MODE=before
+
+Event-loop delay observations:
+event-loop max delay: 20015.22 ms
+event-loop max delay: 20048.77 ms
+event-loop max delay: 20032.00 ms
+
+Observation:
+The main thread was blocked for approximately 20 seconds.
+The event loop experienced very high delays during the blocking job.
+"@ | Set-Content evidence/lag-before.txt

@@ -1,0 +1,15 @@
+@"
+Test: MODE=after
+
+Worker job duration: approximately 20000 ms
+
+Event-loop delay observations:
+event-loop max delay: 34.31 ms
+event-loop max delay: 58.10 ms
+event-loop max delay: 110.69 ms
+event-loop max delay: 97.26 ms
+
+Observation:
+The CPU-intensive job ran in a Worker Thread.
+The main event loop remained much more responsive than in MODE=before.
+"@ | Set-Content evidence/lag-after.txt
