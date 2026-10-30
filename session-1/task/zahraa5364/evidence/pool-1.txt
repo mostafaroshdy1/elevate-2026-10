@@ -1,0 +1,4 @@
+UV_THREADPOOL_SIZE=1
+Total time for 8 hashes: 219.53 ms
+Average per hash: 27.44 ms
+Heartbeats: 1

@@ -1,0 +1,14 @@
+{
+  "name": "session-1-event-loop-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "server": "node src/server.mjs",
+    "probe": "node probe.mjs",
+    "pool": "node src/pool.mjs"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

@@ -1,0 +1,16 @@
+Worker log:
+job:start 2026-10-29T06:34:43.310Z
+job:end   2026-10-29T06:35:03.345Z
+elapsedMs=20000
+
+Event-loop delay observations:
+event-loop max delay: 34.31 ms
+event-loop max delay: 58.10 ms
+event-loop max delay: 110.69 ms
+event-loop max delay: 97.26 ms
+
+Probe results:
+Requests completed: 344
+Fastest: 0.92 ms
+Slowest: 56.76 ms
+Average: 3.30 ms
