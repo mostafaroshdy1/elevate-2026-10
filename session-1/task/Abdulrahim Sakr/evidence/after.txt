@@ -1,0 +1,7 @@
+Task 1 — Worker Thread probe configuration
+
+Endpoint: GET http://localhost:3000/api
+Probe duration: 90 seconds
+Probe interval: 250 ms
+
+Run the server with BLOCKING_MODE=worker, then run `node probe.mjs`. This file is reserved for that raw probe output. Historical raw measurements were not available in the retained session context; no values are fabricated.
