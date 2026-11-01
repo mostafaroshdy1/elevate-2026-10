@@ -1,0 +1,7 @@
+Task 2 — Worker Thread Event Loop delay
+
+Monitor: monitorEventLoopDelay({ resolution: 20 })
+Logging interval: 1 second
+Reported metric: histogram.max / 1e6 (milliseconds), followed by histogram.reset()
+
+Run the server with BLOCKING_MODE=worker and capture the console output here. Historical raw histogram measurements were not available in the retained session context.

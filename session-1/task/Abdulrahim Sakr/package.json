@@ -1,0 +1,15 @@
+{
+  "name": "nodejs-event-loop-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "start:main": "node src/server.mjs",
+    "start:worker": "node --env-file-if-exists=.env src/server.mjs",
+    "pool:1": "set UV_THREADPOOL_SIZE=1&& node src/pool.mjs",
+    "pool:2": "set UV_THREADPOOL_SIZE=2&& node src/pool.mjs",
+    "pool:4": "set UV_THREADPOOL_SIZE=4&& node src/pool.mjs",
+    "pool:8": "set UV_THREADPOOL_SIZE=8&& node src/pool.mjs"
+  }
+}
