@@ -1,0 +1,14 @@
+UV_THREADPOOL_SIZE=1
+
+I ran 8 PBKDF2 operations at the same time.
+
+- Iterations: 200000
+- Key length: 32
+- Digest: sha256
+
+Results:
+- All 8 operations completed successfully.
+- Total execution time: 300.1029 ms
+- Average time per operation: 37.5129 ms
+
+The heartbeat continued running while the operations were being processed.

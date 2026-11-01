@@ -1,0 +1,14 @@
+UV_THREADPOOL_SIZE=8
+
+I ran the experiment again, this time using 8 threads.
+
+- Iterations: 200000
+- Key length: 32
+- Digest: sha256
+
+Results:
+- All 8 operations completed successfully.
+- Total execution time: 129.8459 ms
+- Average time per operation: 16.2307 ms
+
+I expected this run to be faster than the previous one, but it actually took a little longer than using 4 threads.

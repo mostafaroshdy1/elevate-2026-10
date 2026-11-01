@@ -1,0 +1,15 @@
+UV_THREADPOOL_SIZE=4
+
+I repeated the experiment with a thread pool size of 4.
+
+- Iterations: 200000
+- Key length: 32
+- Digest: sha256
+
+Results:
+- All 8 operations completed successfully.
+- Total execution time: 107.0662 ms
+- Average time per operation: 13.3833 ms
+
+This was the fastest result in my experiments.
+The heartbeat also continued running while the hashes were executing.
