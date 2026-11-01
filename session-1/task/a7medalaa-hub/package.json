@@ -1,0 +1,16 @@
+{
+  "name": "session-1-event-loop-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Session 1 - Event Loop Lab: block the loop, fix it with a worker, measure lag, compare the libuv pool.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "start": "node src/server.mjs --mode=worker",
+    "start:blocking": "node src/server.mjs --mode=blocking",
+    "probe": "node probe.mjs",
+    "pool": "node src/pool.mjs"
+  }
+}
