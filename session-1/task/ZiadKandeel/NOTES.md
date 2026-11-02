@@ -49,6 +49,9 @@ Moving CPU-intensive work to a Worker Thread prevents it from blocking the Main 
 
 
 
+
+
+
 ## Task 2 — Event Loop Delay Monitoring
 
 ### Why does the monitoring log stop during the block?
