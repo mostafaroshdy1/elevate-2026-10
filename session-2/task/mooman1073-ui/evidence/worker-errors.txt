@@ -1,0 +1,9 @@
+Test: worker error
+Pending request: HTTP 500, {"error":"The worker failed. Please try again."}
+Health after failure: HTTP 200
+Next request with replacement worker: HTTP 200, {"requestId":"f3456e7c-1cd0-40c9-b26a-66cf30419555","count":1000,"meanTemperature":11.917}
+
+Test: worker exit
+Pending request: HTTP 500, {"error":"The worker stopped before finishing the request."}
+Health after failure: HTTP 200
+Next request with replacement worker: HTTP 200, {"requestId":"addfd74f-431e-42f0-80cc-4e5bb9c1bc04","count":1000,"meanTemperature":11.994}

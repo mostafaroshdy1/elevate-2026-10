@@ -1,0 +1,14 @@
+Progress: 10%
+Progress: 20%
+Progress: 30%
+Progress: 40%
+Progress: 50%
+Progress: 60%
+Progress: 70%
+Progress: 80%
+Progress: 90%
+Progress: 100%
+Total rows: 1000000
+Average temperature: 12.5
+Minimum temperature: -10
+Maximum temperature: 35
