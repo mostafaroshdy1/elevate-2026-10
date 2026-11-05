@@ -1,0 +1,4 @@
+﻿Health check results:
+{"ok":true} | elapsed: 62.8548 ms
+{"ok":true} | elapsed: 20.8862 ms
+{"ok":true} | elapsed: 24.5337 ms
