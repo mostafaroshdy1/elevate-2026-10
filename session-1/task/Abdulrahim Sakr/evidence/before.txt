@@ -1,0 +1,7 @@
+Task 1 — baseline probe configuration
+
+Endpoint: GET http://localhost:3000/api
+Probe duration: 90 seconds
+Probe interval: 250 ms
+
+This file is reserved for the raw output of `node probe.mjs` while the synchronous CPU block runs on the main thread. Historical raw measurements were not available in the retained session context; no values are fabricated.

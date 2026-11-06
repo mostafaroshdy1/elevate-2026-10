@@ -1,0 +1,7 @@
+UV_THREADPOOL_SIZE=8
+Operations: 8
+PBKDF2 iterations: 200000
+Key length: 32 bytes
+Digest: sha256
+Total time: 129.8459 ms
+Average per operation: 16.2307 ms

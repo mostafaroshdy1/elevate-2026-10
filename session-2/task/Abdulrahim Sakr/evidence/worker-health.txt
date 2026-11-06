@@ -1,0 +1,19 @@
+Test: Worker Mean Temperature with count=5000000
+
+Request:
+GET /api/v1/cities/mean-temperature?count=5000000
+
+Response:
+{
+  "count": 5000000,
+  "meanTemperature": 15
+}
+
+Health Request:
+GET /api/v1/health
+
+Health Response Time: 0ms
+
+Observation:
+The health endpoint responded while the Worker was
+processing the mean temperature calculation.
