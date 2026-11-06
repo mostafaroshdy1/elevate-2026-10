@@ -1,0 +1,29 @@
+Pool size: 8
+Hashes: 8, iterations: 600000, key length: 32, digest: sha512
+Fixed test password and salt are used for this lab only.
+heartbeat: 138.46 ms, gap: 138.46 ms
+heartbeat: 292.72 ms, gap: 154.26 ms
+heartbeat: 463.81 ms, gap: 171.09 ms
+heartbeat: 634.14 ms, gap: 170.34 ms
+heartbeat: 786.97 ms, gap: 152.83 ms
+heartbeat: 963.22 ms, gap: 176.25 ms
+heartbeat: 1115.14 ms, gap: 151.92 ms
+heartbeat: 1287.07 ms, gap: 171.93 ms
+heartbeat: 1454.51 ms, gap: 167.43 ms
+heartbeat: 1603.33 ms, gap: 148.83 ms
+heartbeat: 1783.76 ms, gap: 180.43 ms
+heartbeat: 1925.50 ms, gap: 141.73 ms
+Hash 1: 1925.62 ms, result length: 32 bytes
+Hash 5: 1924.38 ms, result length: 32 bytes
+Hash 4: 1954.04 ms, result length: 32 bytes
+Hash 6: 1954.08 ms, result length: 32 bytes
+Hash 8: 1954.12 ms, result length: 32 bytes
+Hash 3: 1960.82 ms, result length: 32 bytes
+Hash 2: 1982.48 ms, result length: 32 bytes
+Hash 7: 1991.23 ms, result length: 32 bytes
+
+Summary
+Total time: 1993.03 ms
+Total time / 8: 249.13 ms
+Mean request-to-completion time per hash: 1955.85 ms
+Largest heartbeat gap: 180.43 ms
