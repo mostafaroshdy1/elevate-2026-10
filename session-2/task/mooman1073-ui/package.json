@@ -1,0 +1,14 @@
+{
+  "name": "session-2-streams-and-workers",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.18.0" },
+  "scripts": {
+    "generate": "node src/streams/generate-data.mjs",
+    "stats": "node src/streams/stream-stats.mjs",
+    "gzip": "node src/streams/stream-gzip.mjs",
+    "demo": "node src/workers/shared-demo.mjs",
+    "start": "node src/workers/main.mjs"
+  }
+}
