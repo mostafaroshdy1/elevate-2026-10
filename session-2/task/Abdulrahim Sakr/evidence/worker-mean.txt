@@ -1,0 +1,10 @@
+GET /api/v1/cities/mean-temperature?count=1000
+
+Response:
+{
+  "count": 1000,
+  "meanTemperature": 15.33
+}
+
+HTTP Status: 200
+Response Time: 2ms

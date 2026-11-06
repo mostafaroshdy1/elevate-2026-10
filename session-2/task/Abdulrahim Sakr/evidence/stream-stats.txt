@@ -1,0 +1,18 @@
+
+Progress: 10%
+Progress: 20%
+Progress: 30%
+Progress: 40%
+Progress: 50%
+Progress: 60%
+Progress: 70%
+Progress: 80%
+Progress: 90%
+Progress: 100%
+
+========== STREAM STATS ==========
+Total Rows: 565760
+Average Temperature: 25.94999999997496
+Min Temperature: 19.8
+Max Temperature: 35.2
+==================================

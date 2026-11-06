@@ -1,0 +1,5 @@
+
+Name                  Length
+----                  ------
+cities.ndjson         24918 KB
+cities.ndjson.gz      109 KB
