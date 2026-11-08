@@ -1,0 +1,1 @@
+﻿{"meanTemperature":11.865}
