@@ -1,0 +1,16 @@
+{
+  "name": "event-loop-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "before": "node src/server.ts",
+    "probe": "node probe.mjs"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  }
+}
