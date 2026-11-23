@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Session 5 Quiz</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #16203a;
+    --panel2: #1b2746;
+    --codebg: #0b1019;
+    --accent: #22d3ee;
+    --accent2: #fbbf24;
+    --good: #34d399;
+    --bad: #fb7185;
+    --violet: #a78bfa;
+    --text: #eef2f9;
+    --muted: #94a3b8;
+    --line: #2b3855;
+    --mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: radial-gradient(1200px 800px at 80% -10%, #16223f 0%, var(--bg) 55%);
+    background-color: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+  }
+  button { font-family: inherit; }
+
+  /* top bar */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+    display: flex; align-items: center; gap: 1rem;
+    padding: .6rem 1.2rem; background: rgba(11,18,32,.85);
+    border-bottom: 1px solid var(--line); backdrop-filter: blur(6px);
+  }
+  .brand { font-weight: 800; font-size: .95rem; letter-spacing: .02em; white-space: nowrap; }
+  .brand span { color: var(--accent); }
+  .dots { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; justify-content: center; }
+  .dot {
+    width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--line);
+    background: var(--panel); cursor: pointer; font-size: 9px; color: var(--muted);
+    display: grid; place-items: center; padding: 0;
+  }
+  .dot.sec-cache { border-bottom: 2px solid var(--accent2); }
+  .dot.sec-rate { border-bottom: 2px solid var(--bad); }
+  .dot.sec-grpc { border-bottom: 2px solid var(--violet); }
+  .dot.ok { background: rgba(52,211,153,.35); color: #fff; }
+  .dot.ko { background: rgba(251,113,133,.35); color: #fff; }
+  .dot.here { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .score { color: var(--accent2); font-weight: 800; white-space: nowrap; }
+
+  .deck { position: absolute; top: 52px; bottom: 0; left: 0; right: 0; }
+  .slide {
+    position: absolute; inset: 0; display: none;
+    padding: 4vh 6vw 6rem; overflow-y: auto;
+    animation: fade .35s ease;
+  }
+  .slide.active { display: block; }
+  .slide-inner { max-width: 1100px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; justify-content: center; }
+  @keyframes fade { from { opacity: 0; transform: translateY(12px);} to { opacity: 1; transform: none; } }
+
+  h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.06; margin-bottom: 1rem; letter-spacing: -0.02em; }
+  h1 .hl { color: var(--accent); }
+  h2 { font-size: clamp(1.4rem, 3vw, 2rem); margin-bottom: .8rem; letter-spacing: -0.01em; line-height: 1.2; }
+  .kicker { display: block; font-size: .8rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 800; margin-bottom: .5rem; color: var(--accent); }
+  .kicker.cache { color: var(--accent2); }
+  .kicker.rate { color: var(--bad); }
+  .kicker.grpc { color: var(--violet); }
+  .subtitle { font-size: 1.2rem; color: var(--muted); max-width: 60ch; line-height: 1.5; }
+  .qtext { font-size: clamp(1.1rem, 2.2vw, 1.4rem); font-weight: 600; margin-bottom: 1rem; line-height: 1.4; }
+  .qtext code, .answer code, .hint code, .opt code, .subtitle code, li code {
+    font-family: var(--mono); font-size: .9em; color: #bfe3ff; background: rgba(255,255,255,.07);
+    padding: .05em .35em; border-radius: 4px;
+  }
+  .hint { color: var(--muted); font-size: .98rem; margin: -.4rem 0 .9rem; }
+
+  .code { background: var(--codebg); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: .2rem 0 1rem; }
+  .code .lang { padding: .4rem 1rem; font-weight: 700; font-size: .85rem; background: #121a2a; border-bottom: 1px solid var(--line); color: var(--muted); }
+  .code pre { padding: .9rem 1.1rem; overflow-x: auto; margin: 0; }
+  .code code { font-family: var(--mono); font-size: .88rem; line-height: 1.6; color: #e6edf3; white-space: pre; }
+  .tok-k { color: #c792ea; } .tok-s { color: #a5e075; } .tok-n { color: #f0a45c; } .tok-c { color: #7d8590; font-style: italic; }
+
+  /* options */
+  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; max-width: 980px; }
+  .opt {
+    text-align: left; background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    padding: .8rem 1rem; border-radius: 10px; font-size: 1.02rem; line-height: 1.4;
+    cursor: pointer; transition: .15s; display: flex; gap: .7rem; align-items: flex-start;
+  }
+  .opt .letter { font-weight: 800; color: var(--accent); min-width: 1.2em; }
+  .opt:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-2px); }
+  .opt:disabled { cursor: default; }
+  .opt.correct { background: rgba(52,211,153,.14); border-color: var(--good); }
+  .opt.correct .letter { color: var(--good); }
+  .opt.wrong { background: rgba(251,113,133,.14); border-color: var(--bad); }
+  .opt.wrong .letter { color: var(--bad); }
+
+  /* ordering */
+  .order-pool, .order-picked { display: flex; flex-wrap: wrap; gap: .5rem; min-height: 3rem; }
+  .order-picked { padding: .7rem; border: 1px dashed var(--line); border-radius: 10px; margin: .6rem 0; }
+  .order-picked:empty::before { content: "Click the items above in the right order…"; color: var(--muted); font-size: .95rem; }
+  .chip {
+    background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    padding: .5rem .8rem; border-radius: 999px; cursor: pointer; font-size: .98rem;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip .n { color: var(--accent2); font-weight: 800; margin-right: .35rem; }
+  .chip.used { opacity: .3; pointer-events: none; }
+  .chip.good { border-color: var(--good); background: rgba(52,211,153,.14); }
+  .chip.badc { border-color: var(--bad); background: rgba(251,113,133,.14); }
+  .row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+  .btn {
+    background: var(--panel2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: .55rem 1rem; font-size: .98rem; cursor: pointer;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #04202a; border-color: var(--accent); font-weight: 700; }
+  .btn.primary:hover { color: #04202a; filter: brightness(1.1); }
+  .btn.on { border-color: var(--accent2); color: var(--accent2); }
+  input.num {
+    background: var(--codebg); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: .55rem .8rem; font-size: 1.1rem; width: 8rem; font-family: var(--mono);
+  }
+
+  .answer {
+    margin-top: 1rem; padding: .9rem 1.2rem;
+    background: rgba(34,211,238,.08); border-left: 3px solid var(--accent);
+    border-radius: 8px; font-size: 1.02rem; line-height: 1.55;
+    display: none; max-width: 980px;
+  }
+  .answer.show { display: block; animation: fade .3s ease; }
+  .answer.ko { border-left-color: var(--bad); background: rgba(251,113,133,.07); }
+  .answer.okk { border-left-color: var(--good); background: rgba(52,211,153,.07); }
+  .answer b { color: var(--accent2); }
+  .verdict { font-weight: 800; margin-right: .4rem; }
+  .verdict.g { color: var(--good); } .verdict.r { color: var(--bad); }
+
+  /* simulators */
+  .sim {
+    background: linear-gradient(180deg, rgba(22,32,58,.9), rgba(14,23,48,.9));
+    border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.1rem; margin: .3rem 0 1.1rem;
+  }
+  .sim-title { font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: .6rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .sim-title em { font-style: normal; color: var(--muted); letter-spacing: .02em; text-transform: none; font-weight: 500; }
+  .sim svg { width: 100%; height: auto; display: block; }
+  .sim .stat { font-family: var(--mono); font-size: .95rem; color: var(--muted); }
+  .sim .stat b { color: var(--text); }
+  .sim .stat .bad { color: var(--bad); } .sim .stat .good { color: var(--good); }
+  .sim label { font-size: .92rem; color: var(--muted); display: inline-flex; align-items: center; gap: .4rem; cursor: pointer; }
+  .sim input[type=range] { accent-color: var(--accent); }
+  .sim input[type=checkbox] { accent-color: var(--accent2); width: 1rem; height: 1rem; }
+  .layers { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; margin: .4rem 0 .7rem; }
+  .layer {
+    border: 1px solid var(--line); border-radius: 10px; padding: .6rem; background: var(--codebg);
+    position: relative; transition: .2s; min-height: 96px;
+  }
+  .layer h4 { font-size: .92rem; margin-bottom: .2rem; }
+  .layer .lat { font-family: var(--mono); font-size: .78rem; color: var(--muted); }
+  .layer .val { font-family: var(--mono); font-size: .78rem; margin-top: .35rem; }
+  .layer .val.empty { color: var(--muted); }
+  .layer .val.fresh { color: var(--good); }
+  .layer .val.stale { color: var(--accent2); }
+  .layer.hit { border-color: var(--good); box-shadow: 0 0 0 2px rgba(52,211,153,.35); }
+  .layer.miss { border-color: var(--bad); }
+  .layer.pass { opacity: .55; }
+  .log { font-family: var(--mono); font-size: .85rem; color: var(--muted); background: var(--codebg); border-radius: 8px; padding: .6rem .8rem; margin-top: .6rem; max-height: 8.5rem; overflow-y: auto; border: 1px solid var(--line); }
+  .log div { padding: .1rem 0; }
+  .log .g { color: var(--good); } .log .r { color: var(--bad); } .log .y { color: var(--accent2); }
+  .tabs { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .6rem; }
+
+  .section-card { border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; background: var(--panel); margin-top: 1.2rem; max-width: 760px; }
+  ul.recap { list-style: none; margin-top: .6rem; }
+  ul.recap li { font-size: 1.05rem; line-height: 1.5; margin-bottom: .45rem; padding-left: 1.5rem; position: relative; }
+  ul.recap li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+  .final-score { font-size: clamp(2.4rem, 7vw, 4.4rem); font-weight: 900; }
+  .final-score span { color: var(--accent); }
+  .bars { display: grid; gap: .6rem; margin: 1rem 0; max-width: 640px; }
+  .bar { display: grid; grid-template-columns: 9rem 1fr 4rem; gap: .7rem; align-items: center; font-size: .98rem; }
+  .bar .track { height: 12px; background: var(--codebg); border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
+  .bar .fill { height: 100%; border-radius: 999px; }
+  .review { margin-top: .6rem; display: flex; flex-wrap: wrap; gap: .4rem; }
+
+  .nav { position: fixed; bottom: 1.1rem; right: 1.5rem; display: flex; align-items: center; gap: .7rem; color: var(--muted); font-size: .95rem; z-index: 20; }
+  .nav .progress { letter-spacing: .08em; background: rgba(11,18,32,.8); padding: .3rem .6rem; border-radius: 6px; }
+
+  @media (max-width: 820px) {
+    .slide { padding: 3vh 16px 6rem; }
+    .opts { grid-template-columns: 1fr; }
+    .layers { grid-template-columns: 1fr 1fr; }
+    .dots { display: none; }
+    .code code { font-size: .78rem; }
+    .bar { grid-template-columns: 6rem 1fr 3.5rem; }
+  }
+  @media print {
+    body { overflow: visible; background: #fff; color: #111; }
+    .topbar, .nav { display: none; }
+    .deck { position: static; }
+    .slide { display: block !important; position: relative; page-break-after: always; }
+    .answer { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Session 5 · <span>Caching · Rate limiting · gRPC</span></div>
+  <div class="dots" id="dots"></div>
+  <div class="score" id="score">0 / 0</div>
+</header>
+
+<main class="deck" id="deck"></main>
+
+<div class="nav">
+  <button class="btn" id="prev" aria-label="Previous">← Prev</button>
+  <span class="progress" id="progress"></span>
+  <button class="btn" id="next" aria-label="Next">Next →</button>
+</div>
+
+<!-- ===================== SIMULATOR TEMPLATES ===================== -->
+
+<template id="sim-layers">
+  <div class="sim" data-sim="layers">
+    <div class="sim-title">Simulator · cache layers <em>A request falls through the layers until one has a fresh copy</em></div>
+    <div class="layers">
+      <div class="layer" data-l="0"><h4>Browser</h4><div class="lat">+0 ms · max-age</div><div class="val"></div></div>
+      <div class="layer" data-l="1"><h4>CDN / reverse proxy</h4><div class="lat">+15 ms · whole response</div><div class="val"></div></div>
+      <div class="layer" data-l="2"><h4>Redis</h4><div class="lat">+2 ms · shared</div><div class="val"></div></div>
+      <div class="layer" data-l="3"><h4>Node.js app</h4><div class="lat">+3 ms · logic</div><div class="val"></div></div>
+      <div class="layer" data-l="4"><h4>PostgreSQL</h4><div class="lat">+40 ms · source of truth</div><div class="val"></div></div>
+    </div>
+    <div class="row">
+      <button class="btn primary" data-act="get">GET /posts/1</button>
+      <button class="btn" data-act="write">PATCH /posts/1 (write-around + DEL redis key)</button>
+      <button class="btn" data-act="tick">⏱ +60 s (browser &amp; CDN copies expire)</button>
+      <button class="btn" data-act="reset">Reset</button>
+    </div>
+    <div class="log"></div>
+  </div>
+</template>
+
+<template id="sim-stampede">
+  <div class="sim" data-sim="stampede">
+    <div class="sim-title">Simulator · cache stampede <em>40 hot keys, cached at t = 0 with TTL 30 s. Bars = DB queries per second.</em></div>
+    <div class="row" style="margin-bottom:.5rem">
+      <label>Concurrent requests per hot key while it rebuilds <input type="range" min="1" max="300" value="150" data-in="conc"> <b data-out="conc">150</b></label>
+    </div>
+    <div class="row" style="margin-bottom:.6rem">
+      <label><input type="checkbox" data-in="jitter"> Jitter the TTL (±10 s)</label>
+      <label><input type="checkbox" data-in="lock"> Lock on miss (one request rebuilds)</label>
+      <label><input type="checkbox" data-in="early"> Early refresh (refresh at 80 % of TTL, before it expires)</label>
+    </div>
+    <svg viewBox="0 0 800 230" data-chart></svg>
+    <div class="stat" data-stat></div>
+  </div>
+</template>
+
+<template id="sim-rate">
+  <div class="sim" data-sim="rate">
+    <div class="sim-title">Simulator · rate limiting <em>Same request stream, three algorithms. Limit: 5 requests / 10 s (bucket: 5 tokens, +0.5 token/s)</em></div>
+    <div class="row" style="margin-bottom:.6rem">
+      <button class="btn" data-act="boundary">Scenario: boundary burst</button>
+      <button class="btn" data-act="steady">Scenario: steady 1 req/s</button>
+      <button class="btn" data-act="idle">Scenario: idle, then burst of 12</button>
+      <span style="flex:1"></span>
+      <button class="btn primary" data-act="play">▶ Live</button>
+      <button class="btn" data-act="one">Send 1</button>
+      <button class="btn" data-act="five">Burst ×5</button>
+      <button class="btn" data-act="clear">Clear</button>
+    </div>
+    <svg viewBox="0 0 800 260" data-chart></svg>
+    <div class="stat" data-stat></div>
+  </div>
+</template>
+
+<template id="sim-grpc">
+  <div class="sim" data-sim="grpc">
+    <div class="sim-title">Simulator · the four RPC shapes <em>Pick a shape and watch the messages on one HTTP/2 stream</em></div>
+    <div class="tabs">
+      <button class="btn on" data-shape="unary">Unary</button>
+      <button class="btn" data-shape="server">Server streaming</button>
+      <button class="btn" data-shape="client">Client streaming</button>
+      <button class="btn" data-shape="bidi">Bidirectional</button>
+      <span style="flex:1"></span>
+      <button class="btn primary" data-act="replay">↻ Replay</button>
+    </div>
+    <div class="code"><div class="lang">.proto</div><pre><code data-proto></code></pre></div>
+    <svg viewBox="0 0 800 220" data-chart></svg>
+    <div class="stat" data-stat></div>
+  </div>
+</template>
+
+<script>
+/* ============================================================
+   QUESTIONS
+   type: mcq | order | num
+   ============================================================ */
+const SECTIONS = {
+  cache: { name: 'Caching', color: 'var(--accent2)', cls: 'cache' },
+  rate:  { name: 'Rate limiting', color: 'var(--bad)', cls: 'rate' },
+  grpc:  { name: 'gRPC', color: 'var(--violet)', cls: 'grpc' },
+};
+
+const Q = [
+  /* ---------------- CACHING ---------------- */
+  { sec: 'cache', kicker: 'Why cache', type: 'mcq',
+    q: 'Your p99 latency is bad and the database CPU is at 90 %. What does a cache give you here?',
+    options: [
+      'Lower latency only. The database load stays the same.',
+      'Lower latency, and protection for the DB: a cache hit never touches the database.',
+      'Stronger consistency, because the cache always has the newest data.',
+      'Nothing. Caching only helps static files.' ],
+    correct: 1,
+    explain: 'Caching gives you <b>latency</b> (memory is about 100× faster than a DB query) and <b>load</b> (a hit never reaches the DB, which protects it during spikes). The price is <b>staleness</b>, so a cache never gives you stronger consistency.' },
+
+  { sec: 'cache', kicker: 'In-app cache', type: 'mcq',
+    q: 'You run 3 app nodes, and each one has its own <code>Map</code> cache. Which of these is <span style="color:var(--accent2)">NOT</span> a problem caused by that?',
+    options: [
+      'The same data is stored 3 times (duplicate memory).',
+      'Node 1 serves fresh data while node 2 serves stale data.',
+      'Each cache read needs a network round-trip.',
+      'A write on node 1 cannot invalidate the copies on nodes 2 and 3.' ],
+    correct: 2,
+    explain: 'An in-process cache is the <b>fastest</b> kind: no network and no serialization. Its problems are duplicate memory, inconsistency, more misses (each node warms its own copy) and <b>no shared invalidation</b>. The fix is to move the cache into a shared store such as Redis.' },
+
+  { sec: 'cache', kicker: 'Cache-aside', type: 'order',
+    q: 'Put the <b>cache-aside</b> read path in order.',
+    items: ['Check Redis for user:42', 'On a hit, return it', 'On a miss, query the DB', 'SET user:42 … EX 300', 'Return the user'],
+    explain: 'Cache-aside is <b>lazy</b>: check the cache, return on a hit; on a miss, read the DB, store the value with a TTL, then return it. Only data someone asks for gets cached, and the first request is slow.' },
+
+  { sec: 'cache', kicker: 'Spot the bug', type: 'mcq',
+    q: 'This code runs in production and has no other invalidation. What is the bug?',
+    code: `async function getPost(id) {
+  const hit = await redis.get(\`post:\${id}\`);
+  if (hit) return JSON.parse(hit);
+  const post = await db.posts.find(id);
+  await redis.set(\`post:\${id}\`, JSON.stringify(post));
+  return post;
+}`,
+    options: [
+      'JSON.parse is too slow for a cache.',
+      'There is no TTL, so a post that is edited is served stale forever.',
+      'It must check the DB before the cache.',
+      'redis.set must be called before the DB query.' ],
+    correct: 1,
+    explain: 'Without <code>EX</code> the key never expires. With no explicit invalidation either, an edited post stays stale <b>forever</b>. The TTL is the safety net that makes a cache always converge.' },
+
+  { sec: 'cache', kicker: 'Write path', type: 'mcq',
+    q: 'An <b>audit-log</b> table is written thousands of times a minute and almost never read. Which write strategy fits?',
+    options: [
+      'Write-through: write to the cache and the DB together.',
+      'Write-around: write only to the DB and fill the cache lazily on a read.',
+      'Write-back: write to the cache, flush to the DB later.',
+      'Cache every row forever.' ],
+    correct: 1,
+    explain: '<b>Write-around</b> avoids filling the cache with data nobody reads, and writes stay cheap. Write-through keeps the cache fresh, but every write pays twice. Write-back is the fastest but the <b>riskiest</b>: you lose data if the cache dies before it flushes.' },
+
+  { sec: 'cache', kicker: 'Invalidation', type: 'mcq',
+    q: 'The gateway caches <code>post:1:full</code> = post + <b>author name</b> + comments. A user renames themselves. You already delete <code>post:1:full</code> on PATCH /posts/1. What is missing?',
+    options: [
+      'Nothing. The post did not change.',
+      'Invalidate every cached post of that author (or use a short TTL and accept staleness on purpose).',
+      'Restart Redis.',
+      'Switch to write-back.' ],
+    correct: 1,
+    explain: 'The cached value is built from <b>several sources</b>. Any write to one of them must invalidate it. Explicit invalidation is precise but "easy to miss a key". This is that missed key. The options are tracking keys per author, versioned keys, or deliberately relying on the TTL.' },
+
+  { sec: 'cache', kicker: 'Keeping it correct', type: 'mcq',
+    q: 'Which invalidation strategy does the session recommend as the default?',
+    options: [
+      'TTL only.',
+      'Explicit invalidation only. TTLs hide bugs.',
+      'A TTL as a safety net, plus explicit invalidation on writes.',
+      'Never invalidate. Use versioned keys for everything.' ],
+    correct: 2,
+    explain: 'Explicit invalidation makes the common case fresh, and the <b>TTL catches the keys you missed</b>. The cache must also self-heal after a restart. Versioned keys (<code>user:42:v3</code>) are another valid tool: you never mutate a key, you publish a new version.' },
+
+  { sec: 'cache', kicker: 'All layers together', type: 'order', sim: 'sim-layers',
+    q: 'Use the simulator, then order the cache layers from <b>closest to the user</b> to the <b>source of truth</b>.',
+    items: ['Browser cache', 'CDN / reverse proxy', 'Redis / Memcached', 'In-process cache', 'PostgreSQL'],
+    explain: 'Each layer answers before the one behind it sees the request, and a miss falls through to the next layer. Answer <b>as far from the DB as possible</b>. In the simulator, notice that after a PATCH the browser and CDN can still serve the old copy until <code>max-age</code> runs out. Deleting the Redis key does not reach them.' },
+
+  { sec: 'cache', kicker: 'Browser cache', type: 'mcq',
+    q: 'Response header: <code>Cache-Control: private, max-age=60</code>. Who may cache it, and for how long?',
+    options: [
+      'Any proxy or CDN, for 60 minutes.',
+      'Only the end user\'s browser, for 60 seconds, without asking the server again.',
+      'Nobody. <code>private</code> means do not cache.',
+      'The browser, but it must revalidate on every request.' ],
+    correct: 1,
+    explain: '<code>private</code> means only the user\'s own browser may store it, never a shared proxy or CDN. <code>max-age=60</code> is in <b>seconds</b>. "Never cache" is <code>no-store</code>; "always revalidate" is <code>no-cache</code>.' },
+
+  { sec: 'cache', kicker: 'ETag', type: 'mcq',
+    q: 'The browser sends <code>If-None-Match: "v3"</code> and the resource is still at version v3. What should the server answer?',
+    options: [
+      '200 OK with the full body again.',
+      '304 Not Modified with no body.',
+      '412 Precondition Failed.',
+      '204 No Content.' ],
+    correct: 1,
+    explain: 'An ETag lets the client ask "is my copy still current?" cheaply. The answer is <b>304 Not Modified</b> with an empty body, and the browser reuses its copy. You save the bandwidth and serialization, but the request still happens.' },
+
+  { sec: 'cache', kicker: 'Stampede', type: 'mcq', sim: 'sim-stampede',
+    q: 'Use the simulator. With <b>lock on miss</b>, what happens to the other requests while one request rebuilds the hot key?',
+    options: [
+      'They all query the DB anyway.',
+      'They get a 500 error.',
+      'They wait briefly and then read the freshly cached value.',
+      'They are rate-limited with 429.' ],
+    correct: 2,
+    explain: 'With lock on miss (single-flight), <b>one</b> request rebuilds the key (<code>SET lock NX PX</code>) and the others wait briefly and then read the cache. The DB sees one query instead of N. In the simulator, turn on only "lock" and watch the peak drop from N × keys to the number of keys.' },
+
+  { sec: 'cache', kicker: 'Stampede', type: 'mcq',
+    q: 'You cached 10,000 product pages at deploy time, all with <code>EX 3600</code>. Exactly one hour later the DB falls over. Which fix targets <b>this</b> cause most directly?',
+    options: [
+      'Jitter the TTL so the keys do not all expire together.',
+      'A bigger Redis instance.',
+      'Switch from cache-aside to write-through.',
+      'Remove the TTL.' ],
+    correct: 0,
+    explain: 'They died <b>together</b> because they were born together with the same TTL. <b>Jitter</b> (random expiry, for example 3600 ± 300 s) spreads the misses out. Turn on only "jitter" in the simulator to see one tall bar become a spread of short bars.' },
+
+  /* ---------------- RATE LIMITING ---------------- */
+  { sec: 'rate', kicker: 'Fixed window', type: 'num', sim: 'sim-rate',
+    q: 'Fixed window, limit <b>3 requests per minute</b>. A client sends 3 requests at 00:59 and 3 more at 01:00. How many are accepted in those ~2 seconds? (Try "boundary burst" in the simulator first.)',
+    answer: [6],
+    explain: '<b>6</b>: 3 count in the 00:xx window and 3 in the 01:xx window. A burst at the boundary is counted in two windows, so up to <b>2× the limit</b> gets through. That is the main weakness of the fixed window.' },
+
+  { sec: 'rate', kicker: 'Sliding window', type: 'mcq',
+    q: 'You implement a <b>sliding window log</b> in Redis. Which data structure fits best per client?',
+    options: [
+      'A string counter with INCR.',
+      'A sorted set (ZSET) of request timestamps.',
+      'A pub/sub channel.',
+      'A list with LPUSH and no trimming.' ],
+    correct: 1,
+    explain: 'A sliding window counts only the last N seconds from <i>now</i>. A <b>ZSET</b> scored by timestamp lets you <code>ZREMRANGEBYSCORE</code> old entries and <code>ZCARD</code> the rest. Run it atomically (Lua or MULTI). It is accurate with no boundary burst, but it uses more memory than a counter.' },
+
+  { sec: 'rate', kicker: 'Token bucket', type: 'num',
+    q: 'Token bucket: <b>capacity 10</b>, refills <b>1 token/s</b>. A client has been idle for 30 s and then sends <b>15</b> requests at once. How many are accepted immediately?',
+    answer: [10],
+    explain: '<b>10</b>. The bucket refills only up to its capacity, so after 30 s idle it holds 10 tokens, not 30. A token bucket <b>allows short bursts up to the bucket size</b> and enforces the refill rate as the average. In the simulator\'s "steady" scenario, its lane smooths traffic to one request every 2 s.' },
+
+  { sec: 'rate', kicker: 'Pick the algorithm', type: 'mcq',
+    q: 'A mobile app syncs in short bursts when it opens, and is quiet otherwise. You want to allow those bursts but cap the average. Which algorithm?',
+    options: ['Fixed window', 'Sliding window log', 'Token bucket', 'No limit at all'],
+    correct: 2,
+    explain: '<b>Token bucket</b>: when you want to allow bursts but enforce an average. Use a sliding window for strict per-key limits, and a fixed window when easy to explain and store matters most.' },
+
+  { sec: 'rate', kicker: 'Distributed state', type: 'num',
+    q: 'Limit = 100 req/min per client, but each of your <b>4 gateway nodes</b> keeps its counter in a local <code>Map</code>. The load balancer uses round-robin. What is the effective limit a client can actually reach per minute?',
+    answer: [400],
+    explain: '<b>400</b>: each node allows 100, so 4 × 100. This is the same lesson as the in-process cache. Counters must live in a <b>shared store (Redis)</b> so that every node sees the same count.' },
+
+  { sec: 'rate', kicker: 'Redis INCR', type: 'mcq',
+    q: 'Two gateway nodes run <code>INCR rl:abc:1712</code> at the same moment. Why can they not both read 7 and both write 8?',
+    code: `const count = await redis.incr(key);
+if (count === 1) await redis.expire(key, 60);
+if (count > LIMIT) return res.status(429).set('Retry-After', 60).end();`,
+    options: [
+      'Because ioredis retries on conflicts.',
+      'Because INCR is atomic: Redis runs commands one at a time on a single thread.',
+      'Because EXPIRE locks the key.',
+      'They can. This code is racy and needs a mutex.' ],
+    correct: 1,
+    explain: 'Redis executes commands <b>one at a time</b>, so INCR is an atomic read-modify-write and the two nodes get 8 and 9. (A smaller gap remains: if the process crashes between INCR and EXPIRE, the key never expires. Use MULTI or a Lua script.)' },
+
+  { sec: 'rate', kicker: 'Signal clearly', type: 'mcq',
+    q: 'A client goes over its limit. What is the best response?',
+    options: [
+      '500 Internal Server Error',
+      '403 Forbidden',
+      '429 Too Many Requests + Retry-After + X-RateLimit-* headers',
+      'Drop the connection silently' ],
+    correct: 2,
+    explain: '<b>429 + Retry-After</b> tells the client it is throttled and <i>when</i> to retry. The <code>X-RateLimit-Limit / Remaining / Reset</code> headers let well-behaved clients slow themselves down before they hit the wall.' },
+
+  { sec: 'rate', kicker: 'Where & what else', type: 'mcq',
+    q: 'Match: "an <b>/admin</b> panel that only your office network should reach". Which protection layer is the coarse but effective fit?',
+    options: ['A rate limit of 10 req/min', 'An IP allow-list', 'A longer JWT expiry', 'A CDN cache'],
+    correct: 1,
+    explain: 'An <b>IP allow-list</b> blocks or allows by network: coarse, but effective for admin endpoints. Real API protection is layered: <b>API keys</b> (who is calling), <b>authentication</b> (JWT/OAuth2), <b>IP rules</b>, a <b>WAF/DDoS</b> filter, and <b>rate limits</b>, enforced first at the gateway / edge.' },
+
+  /* ---------------- gRPC ---------------- */
+  { sec: 'grpc', kicker: 'OSI', type: 'mcq',
+    q: 'On which OSI layers do <b>gRPC</b> and <b>TLS</b> sit?',
+    options: [
+      'gRPC: layer 4 (transport). TLS: layer 3.',
+      'gRPC: layer 7 (application, on HTTP/2). TLS: layer 6 (presentation).',
+      'Both on layer 7.',
+      'gRPC: layer 5 (session). TLS: layer 4.' ],
+    correct: 1,
+    explain: 'gRPC, like HTTP, is an <b>application-layer (7)</b> protocol built on HTTP/2, running over TCP (4) and IP (3). The session places TLS, the "S" in HTTPS, at <b>layer 6</b>.' },
+
+  { sec: 'grpc', kicker: 'LPC vs RPC', type: 'mcq',
+    q: 'What must happen in a <b>remote</b> procedure call that never happens in a local one?',
+    options: [
+      'The arguments are marshalled (serialized), sent over the network, and unmarshalled on the other side.',
+      'The function runs on the same thread, by reference.',
+      'The compiler inlines the call.',
+      'Nothing. RPC is identical to LPC.' ],
+    correct: 0,
+    explain: 'A local call jumps to a known address in the same memory. A remote callee <b>cannot share your memory</b>, so the call is marshalled, sent, unmarshalled and answered. RPC\'s promise is that the <b>stub</b> hides all of this, so it <i>looks</i> local. It still fails and adds latency like a network call.' },
+
+  { sec: 'grpc', kicker: 'The journey', type: 'order',
+    q: 'Order the steps of one gRPC call, from your code to the server and back.',
+    items: ['Call the stub', 'Marshal to protobuf bytes', 'Send as HTTP/2 frames', 'Bytes travel over TCP/IP', 'Server stub unmarshals', 'Your handler runs', 'Response retraces the path'],
+    explain: 'Call stub → marshal → send over HTTP/2 → network → unmarshal → run → return. <b>You write only the two ends.</b> Everything in between is generated from the <code>.proto</code>.' },
+
+  { sec: 'grpc', kicker: 'REST vs gRPC', type: 'mcq',
+    q: 'Which row of the REST vs gRPC comparison is <b>wrong</b>?',
+    options: [
+      'Contract: REST implicit / gRPC .proto with generated stubs',
+      'Format: REST JSON text / gRPC binary protobuf',
+      'Streaming: REST first-class with 4 types / gRPC not native',
+      'Best for: REST public APIs & browsers / gRPC internal service-to-service' ],
+    correct: 2,
+    explain: 'It is the other way round: <b>gRPC</b> has first-class streaming with 4 shapes, and REST/JSON has no native streaming. gRPC also runs only on HTTP/2, while REST works on HTTP/1.1 or HTTP/2.' },
+
+  { sec: 'grpc', kicker: 'RPC shapes', type: 'mcq', sim: 'sim-grpc',
+    q: 'Use the simulator. A client uploads a 2 GB video in chunks and wants <b>one</b> "upload OK" at the end. Which shape?',
+    options: ['Unary', 'Server streaming', 'Client streaming', 'Bidirectional'],
+    correct: 2,
+    explain: '<b>Client streaming</b>: many requests, one reply. Typical uses are uploads and batches. Server streaming is the opposite (one request, many replies: live updates, long lists), and bidi is two independent streams (chat, multiplayer sync).' },
+
+  { sec: 'grpc', kicker: 'Read the code', type: 'mcq',
+    q: 'Which RPC type is this server handler for?',
+    code: `function watchUpdates(call) {
+  for (let i = 0; i < 10; i++) {
+    call.write({ message: \`update \${i}\` });
+  }
+  call.end();
+}`,
+    options: ['Unary', 'Server streaming', 'Client streaming', 'Bidirectional'],
+    correct: 1,
+    explain: 'There is no <code>callback</code> and nothing is read from the client. The handler <b>writes many messages</b> and then <code>end()</code>s, so this is <b>server streaming</b>: <code>rpc WatchUpdates(HelloRequest) returns (stream HelloReply)</code>.' },
+
+  { sec: 'grpc', kicker: 'The contract', type: 'mcq',
+    q: 'What is the single difference, in the <code>.proto</code>, between a unary RPC and a bidirectional one?',
+    code: `rpc SayHello (HelloRequest)    returns (HelloReply);
+rpc Chat     (stream Message)  returns (stream Message);`,
+    options: [
+      'Bidi needs a different service block.',
+      'The <code>stream</code> keyword on the request and/or response.',
+      'Bidi messages cannot have field numbers.',
+      'Bidi needs HTTP/3.' ],
+    correct: 1,
+    explain: 'The <b><code>stream</code> keyword is the whole difference</b>. The stubs, serialization and HTTP/2 transport are the same. The <code>.proto</code> is the API, and both sides compile it, so the contract cannot drift.' },
+
+  { sec: 'grpc', kicker: 'Why gRPC', type: 'mcq',
+    q: 'The gateway keeps <b>one</b> gRPC channel per service and sends hundreds of concurrent calls through it. Why is that fine?',
+    options: [
+      'gRPC sends calls one at a time, so they never overlap.',
+      'HTTP/2 multiplexes many streams over one connection without head-of-line blocking between requests.',
+      'Each call opens a new TCP connection under the hood.',
+      'It is not fine. You need one channel per request.' ],
+    correct: 1,
+    explain: '<b>Multiplexed HTTP/2</b>: many calls share one connection as independent streams of binary frames. This is the big win over opening an HTTP/1.1 round-trip per call, as the HTTP vs gRPC benchmark in the code example shows.' },
+
+  { sec: 'grpc', kicker: 'Limitations', type: 'mcq',
+    q: 'Why does a plain L4 load balancer in front of 3 <code>posts-service</code> replicas often send <b>all</b> the gateway\'s calls to one replica?',
+    options: [
+      'Protobuf is binary, so the balancer cannot read it.',
+      'HTTP/2 keeps one long-lived connection, and an L4 balancer balances connections, not the individual calls inside them.',
+      'gRPC does not support more than one server.',
+      'Because of TLS.' ],
+    correct: 1,
+    explain: 'The balancer sees <b>one long-lived connection</b> and pins it to one replica. It never sees the many calls multiplexed inside. The usual fixes are an L7 (HTTP/2-aware) proxy such as Envoy, or client-side load balancing.' },
+
+  { sec: 'grpc', kicker: 'How to choose', type: 'mcq',
+    q: 'Which pairing follows the session\'s rule of thumb?',
+    options: [
+      'Browser SPA → gRPC directly; internal services → REST',
+      'Browser / public API → REST (or gRPC-Web via a proxy); internal high-volume services → gRPC',
+      'Everything → gRPC, because it is faster',
+      'Everything → REST, because it is readable' ],
+    correct: 1,
+    explain: '<b>gRPC inside the backend, REST at the edges the browser touches.</b> Browsers cannot set HTTP/2 trailers through fetch/XHR, so they need gRPC-Web or Connect plus a proxy. You also debug gRPC with <code>grpcurl</code>, not the network tab.' },
+];
+
+/* ============================================================
+   BUILD SLIDES
+   ============================================================ */
+const deck = document.getElementById('deck');
+const dotsEl = document.getElementById('dots');
+const slides = [];
+const state = Q.map(() => ({ done: false, ok: false }));
+
+function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; }
+function addSlide(node) { const s = document.createElement('section'); s.className = 'slide'; const inner = document.createElement('div'); inner.className = 'slide-inner'; inner.appendChild(node); s.appendChild(inner); deck.appendChild(s); slides.push(s); return s; }
+
+addSlide(el(`<div>
+  <span class="kicker">Elevate · Session 5</span>
+  <h1>Friday night traffic:<br><span class="hl">cache it, limit it, stream it.</span></h1>
+  <p class="subtitle">30 questions on <b style="color:var(--accent2)">caching</b>, <b style="color:var(--bad)">rate limiting</b> and <b style="color:var(--violet)">gRPC</b>, with 4 simulators you can play with before you answer.</p>
+  <div class="section-card">
+    <ul class="recap">
+      <li>Three question types: <b>pick one</b>, <b>put in order</b> (click the chips), and <b>type a number</b>.</li>
+      <li>You get <b>one try</b> per question, and the explanation appears after you answer.</li>
+      <li>Move with <code>←</code> / <code>→</code>, or click a square in the top bar.</li>
+      <li>At the end, screenshot your score for the task (<code>evidence/quiz-score.png</code>).</li>
+    </ul>
+  </div>
+</div>`));
+
+const sectionIntro = {
+  cache: `<div><span class="kicker cache">Part 1 · 12 questions</span><h1>Caching</h1>
+    <p class="subtitle">In-app → Redis → reverse proxy / CDN → browser. Cache-aside, write paths, invalidation, and the stampede.</p></div>`,
+  rate: `<div><span class="kicker rate">Part 2 · 8 questions</span><h1>Rate limiting</h1>
+    <p class="subtitle">Fixed window, sliding window, token bucket, where to enforce, and why the counters live in Redis.</p></div>`,
+  grpc: `<div><span class="kicker grpc">Part 3 · 10 questions</span><h1>gRPC</h1>
+    <p class="subtitle">OSI → LPC vs RPC → the gRPC journey → protobuf → the four RPC shapes → limitations.</p></div>`,
+};
+
+let lastSec = null;
+const qSlideIndex = [];
+Q.forEach((q, qi) => {
+  if (q.sec !== lastSec) { addSlide(el(sectionIntro[q.sec])); lastSec = q.sec; }
+  const wrap = document.createElement('div');
+  const sec = SECTIONS[q.sec];
+  wrap.innerHTML = `<span class="kicker ${sec.cls}">Q${qi + 1} · ${sec.name} · ${q.kicker}</span>
+    <div class="qtext">${q.q}</div>`;
+  if (q.sim) {
+    const t = document.getElementById(q.sim).content.cloneNode(true);
+    wrap.appendChild(t);
+  }
+  if (q.code) {
+    wrap.appendChild(el(`<div class="code"><div class="lang">code</div><pre><code></code></pre></div>`));
+    wrap.querySelector('.code:last-of-type code').textContent = q.code;
+  }
+  const body = document.createElement('div');
+  wrap.appendChild(body);
+  const answer = el(`<div class="answer"></div>`);
+  wrap.appendChild(answer);
+
+  const finish = (ok) => {
+    state[qi] = { done: true, ok };
+    answer.innerHTML = `<span class="verdict ${ok ? 'g' : 'r'}">${ok ? '✓ Correct.' : '✗ Not quite.'}</span>${q.explain}`;
+    answer.classList.add('show', ok ? 'okk' : 'ko');
+    updateScore();
+  };
+
+  if (q.type === 'mcq') {
+    const opts = el(`<div class="opts"></div>`);
+    q.options.forEach((o, oi) => {
+      const b = el(`<button class="opt"><span class="letter">${'ABCD'[oi]}</span><span>${o}</span></button>`);
+      b.addEventListener('click', () => {
+        if (state[qi].done) return;
+        const ok = oi === q.correct;
+        b.classList.add(ok ? 'correct' : 'wrong');
+        opts.children[q.correct].classList.add('correct');
+        [...opts.children].forEach(c => c.disabled = true);
+        finish(ok);
+      });
+      opts.appendChild(b);
+    });
+    body.appendChild(opts);
+  } else if (q.type === 'order') {
+    const pool = el(`<div class="order-pool"></div>`);
+    const picked = el(`<div class="order-picked"></div>`);
+    const controls = el(`<div class="row"><button class="btn primary">Check order</button><button class="btn">Undo</button></div>`);
+    const shuffled = shuffle(q.items.map((t, i) => ({ t, i })));
+    const seq = [];
+    shuffled.forEach(({ t, i }) => {
+      const c = el(`<button class="chip">${t}</button>`);
+      c.addEventListener('click', () => {
+        if (state[qi].done) return;
+        c.classList.add('used');
+        seq.push({ i, c });
+        const pc = el(`<span class="chip"><span class="n">${seq.length}</span>${t}</span>`);
+        picked.appendChild(pc);
+      });
+      pool.appendChild(c);
+    });
+    const [check, undo] = controls.querySelectorAll('button');
+    undo.addEventListener('click', () => {
+      if (state[qi].done || !seq.length) return;
+      const last = seq.pop(); last.c.classList.remove('used'); picked.lastElementChild.remove();
+    });
+    check.addEventListener('click', () => {
+      if (state[qi].done) return;
+      if (seq.length !== q.items.length) { check.textContent = `Pick all ${q.items.length} first`; setTimeout(() => check.textContent = 'Check order', 1400); return; }
+      let ok = true;
+      [...picked.children].forEach((pc, k) => {
+        const good = seq[k].i === k; if (!good) ok = false;
+        pc.classList.add(good ? 'good' : 'badc');
+      });
+      if (!ok) {
+        answer.dataset.correct = 'Correct order: ' + q.items.map((t, k) => `${k + 1}. ${t}`).join(' → ');
+      }
+      check.disabled = undo.disabled = true;
+      finish(ok);
+      if (!ok) answer.insertAdjacentHTML('beforeend', `<div style="margin-top:.5rem;color:var(--muted)">${answer.dataset.correct}</div>`);
+    });
+    body.append(pool, picked, controls);
+  } else if (q.type === 'num') {
+    const row = el(`<div class="row"><input class="num" type="number" inputmode="numeric" placeholder="?"><button class="btn primary">Check</button></div>`);
+    const [inp, btn] = row.children;
+    const go = () => {
+      if (state[qi].done || inp.value === '') return;
+      const ok = q.answer.includes(Number(inp.value));
+      inp.disabled = btn.disabled = true;
+      inp.style.borderColor = ok ? 'var(--good)' : 'var(--bad)';
+      finish(ok);
+    };
+    btn.addEventListener('click', go);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.stopPropagation(); go(); } });
+    body.appendChild(row);
+  }
+
+  const s = addSlide(wrap);
+  qSlideIndex[qi] = slides.length - 1;
+  s.dataset.q = qi;
+
+  const dot = el(`<button class="dot sec-${sec.cls}" title="Q${qi + 1}">${qi + 1}</button>`);
+  dot.addEventListener('click', () => show(qSlideIndex[qi]));
+  dotsEl.appendChild(dot);
+});
+
+const finalSlide = addSlide(el(`<div>
+  <span class="kicker">Results</span>
+  <div class="final-score"><span id="fCorrect">0</span> / 30</div>
+  <p class="subtitle" id="fMsg">Answer the questions to see your score.</p>
+  <div class="bars" id="fBars"></div>
+  <div id="fReview"></div>
+  <div class="section-card">
+    <b>Next:</b> screenshot this screen as <code>evidence/quiz-score.png</code>, and in <code>NOTES.md</code> explain the two questions you missed or guessed. Then open the task README.
+  </div>
+</div>`));
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  // never present an ordering already solved
+  if (a.every((x, k) => x.i === k)) return shuffle(a);
+  return a;
+}
+
+/* ============================================================
+   NAV + SCORE
+   ============================================================ */
+let cur = 0;
+const progress = document.getElementById('progress');
+function show(n) {
+  cur = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((s, k) => s.classList.toggle('active', k === cur));
+  progress.textContent = `${cur + 1} / ${slides.length}`;
+  [...dotsEl.children].forEach((d, k) => d.classList.toggle('here', qSlideIndex[k] === cur));
+  slides[cur].scrollTop = 0;
+  window.dispatchEvent(new CustomEvent('slidechange', { detail: slides[cur] }));
+}
+document.getElementById('next').onclick = () => show(cur + 1);
+document.getElementById('prev').onclick = () => show(cur - 1);
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); show(cur + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(cur - 1);
+  if (e.key === 'Home') show(0);
+  if (e.key === 'End') show(slides.length - 1);
+});
+
+function updateScore() {
+  const answered = state.filter(s => s.done).length;
+  const correct = state.filter(s => s.ok).length;
+  document.getElementById('score').textContent = `${correct} / ${answered}`;
+  [...dotsEl.children].forEach((d, k) => { d.classList.toggle('ok', state[k].done && state[k].ok); d.classList.toggle('ko', state[k].done && !state[k].ok); });
+  document.getElementById('fCorrect').textContent = correct;
+  const msg = document.getElementById('fMsg');
+  const pct = correct / Q.length;
+  msg.textContent = answered < Q.length ? `${answered} of ${Q.length} answered so far.`
+    : pct >= .9 ? 'Outstanding. You are ready for Friday night. 🎯'
+    : pct >= .7 ? 'Solid. Revisit the red squares, then start the task.'
+    : pct >= .5 ? 'Good start. Replay the simulators for the parts you missed.'
+    : 'Go back through the slides on caching layers, rate-limit algorithms and the RPC shapes.';
+  const bars = document.getElementById('fBars'); bars.innerHTML = '';
+  Object.entries(SECTIONS).forEach(([k, s]) => {
+    const idx = Q.map((q, i) => q.sec === k ? i : -1).filter(i => i >= 0);
+    const c = idx.filter(i => state[i].ok).length;
+    bars.appendChild(el(`<div class="bar"><span>${s.name}</span><div class="track"><div class="fill" style="width:${c / idx.length * 100}%;background:${s.color}"></div></div><span>${c} / ${idx.length}</span></div>`));
+  });
+  const wrong = state.map((s, i) => s.done && !s.ok ? i : -1).filter(i => i >= 0);
+  const rev = document.getElementById('fReview');
+  rev.innerHTML = wrong.length ? `<div style="color:var(--muted);margin-top:.4rem">Review these:</div>` : '';
+  const box = el(`<div class="review"></div>`);
+  wrong.forEach(i => { const b = el(`<button class="btn">Q${i + 1} · ${Q[i].kicker}</button>`); b.onclick = () => show(qSlideIndex[i]); box.appendChild(b); });
+  rev.appendChild(box);
+}
+
+/* syntax highlight */
+const TOKEN_RE = /(\/\/[^\n]*)|("[^"\n]*"|'[^'\n]*'|`[^`\n]*`)|\b(const|let|var|await|async|for|of|if|else|new|return|function|rpc|returns|stream|service|message|true|false|null)\b|\b(\d+)\b/g;
+function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function highlight(src) {
+  let out = '', last = 0, m; TOKEN_RE.lastIndex = 0;
+  while ((m = TOKEN_RE.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    const cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'k' : 'n';
+    out += `<span class="tok-${cls}">${esc(m[0])}</span>`;
+    last = m.index + m[0].length;
+  }
+  return out + esc(src.slice(last));
+}
+document.querySelectorAll('.code code:not([data-proto])').forEach(c => c.innerHTML = highlight(c.textContent));
+
+/* ============================================================
+   SIM A — cache layers
+   ============================================================ */
+const NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; }
+
+document.querySelectorAll('[data-sim="layers"]').forEach(root => {
+  const LAT = [0, 15, 2, 3, 40];
+  const names = ['browser', 'CDN', 'Redis', 'app', 'DB'];
+  const logEl = root.querySelector('.log');
+  let dbVersion, copies; // copies[layer] = version or null (layer 3 = app, never stores; layer 4 = DB)
+  const reset = () => { dbVersion = 1; copies = [null, null, null, null, 1]; logEl.innerHTML = ''; render(); log('Empty caches. The DB has post v1.', ''); };
+  function log(t, cls) { const d = document.createElement('div'); d.className = cls; d.textContent = t; logEl.prepend(d); }
+  function render(hitAt = -1) {
+    root.querySelectorAll('.layer').forEach((L, i) => {
+      L.classList.remove('hit', 'miss', 'pass');
+      const v = L.querySelector('.val');
+      if (i === 3) { v.className = 'val empty'; v.textContent = 'stores nothing (stateless)'; }
+      else if (i === 4) { v.className = 'val fresh'; v.textContent = `v${dbVersion}`; }
+      else if (copies[i] == null) { v.className = 'val empty'; v.textContent = 'empty'; }
+      else { const fresh = copies[i] === dbVersion; v.className = 'val ' + (fresh ? 'fresh' : 'stale'); v.textContent = `v${copies[i]}${fresh ? '' : ' (STALE)'}`; }
+      if (hitAt >= 0) { if (i < hitAt && i !== 3) L.classList.add('miss'); if (i === hitAt) L.classList.add('hit'); if (i > hitAt) L.classList.add('pass'); }
+    });
+  }
+  root.querySelector('[data-act="get"]').onclick = () => {
+    let hit = -1, ms = 0;
+    for (let i = 0; i < 5; i++) { ms += LAT[i]; if (i === 3) continue; if (copies[i] != null) { hit = i; break; } }
+    const v = hit === 4 ? dbVersion : copies[hit];
+    // fill the layers in front of the hit
+    for (let i = 0; i < hit; i++) if (i !== 3) copies[i] = v;
+    render(hit);
+    const stale = v !== dbVersion;
+    log(`GET → answered by ${names[hit]} in ~${ms} ms → v${v}${stale ? '  ⚠ stale' : ''}${hit === 0 ? ' (no request left the browser)' : ''}`, stale ? 'y' : hit === 4 ? 'r' : 'g');
+  };
+  root.querySelector('[data-act="write"]').onclick = () => {
+    dbVersion++; copies[4] = dbVersion; copies[2] = null;
+    render(); log(`PATCH → DB is now v${dbVersion}; DEL post:1 in Redis. The browser and CDN still hold their copies until max-age.`, 'y');
+  };
+  root.querySelector('[data-act="tick"]').onclick = () => {
+    copies[0] = null; copies[1] = null; render(); log('⏱ 60 s later: browser and CDN copies expired (max-age=60). Redis entries still have TTL left.', '');
+  };
+  root.querySelector('[data-act="reset"]').onclick = reset;
+  reset();
+});
+
+/* ============================================================
+   SIM B — stampede
+   ============================================================ */
+document.querySelectorAll('[data-sim="stampede"]').forEach(root => {
+  const svg = root.querySelector('[data-chart]');
+  const stat = root.querySelector('[data-stat]');
+  const inp = n => root.querySelector(`[data-in="${n}"]`);
+  const KEYS = 40, TTL = 30, T = 60, BIN = 1, DB_CAP = 1500;
+  // deterministic pseudo-random so the chart does not flicker
+  const rnd = (i) => { const x = Math.sin(i * 9301 + 49297) * 233280; return x - Math.floor(x); };
+  function draw() {
+    const conc = +inp('conc').value; root.querySelector('[data-out="conc"]').textContent = conc;
+    const jitter = inp('jitter').checked, lock = inp('lock').checked, early = inp('early').checked;
+    const bins = new Array(T / BIN).fill(0);
+    for (let k = 0; k < KEYS; k++) {
+      const ttl = TTL + (jitter ? (rnd(k) * 20 - 10) : 0);
+      // expiry events within the window (key re-cached after each rebuild with a fresh TTL)
+      let t = early ? ttl * 0.8 : ttl, n = 0;
+      while (t < T && n < 10) {
+        const q = early ? 1 : (lock ? 1 : conc);
+        bins[Math.floor(t / BIN)] += q;
+        const nextTtl = TTL + (jitter ? (rnd(k * 7 + n + 1) * 20 - 10) : 0);
+        t += early ? nextTtl * 0.8 : nextTtl; n++;
+      }
+    }
+    const peak = Math.max(...bins);
+    const W = 800, H = 230, L = 50, B = 200, top = 15;
+    const yMax = Math.max(peak, DB_CAP) * 1.1;
+    svg.innerHTML = '';
+    const y = v => B - (v / yMax) * (B - top);
+    for (let g = 0; g <= 4; g++) {
+      const v = yMax * g / 4;
+      svg.appendChild(svgEl('line', { x1: L, x2: W - 10, y1: y(v), y2: y(v), stroke: '#2b3855', 'stroke-width': 1 }));
+      svg.appendChild(svgEl('text', { x: L - 6, y: y(v) + 4, 'text-anchor': 'end', fill: '#94a3b8', 'font-size': 11 }, Math.round(v)));
+    }
+    const bw = (W - 10 - L) / bins.length;
+    bins.forEach((v, i) => {
+      if (!v) return;
+      const over = v > DB_CAP;
+      svg.appendChild(svgEl('rect', { x: L + i * bw + 1, y: y(v), width: Math.max(bw - 2, 2), height: B - y(v), rx: 2, fill: over ? '#fb7185' : '#34d399' }));
+    });
+    svg.appendChild(svgEl('line', { x1: L, x2: W - 10, y1: y(DB_CAP), y2: y(DB_CAP), stroke: '#fbbf24', 'stroke-dasharray': '6 4', 'stroke-width': 1.5 }));
+    svg.appendChild(svgEl('text', { x: W - 12, y: y(DB_CAP) - 5, 'text-anchor': 'end', fill: '#fbbf24', 'font-size': 11 }, `DB capacity ≈ ${DB_CAP} q/s`));
+    for (let s = 0; s <= T; s += 10) svg.appendChild(svgEl('text', { x: L + s / BIN * bw, y: B + 16, 'text-anchor': 'middle', fill: '#94a3b8', 'font-size': 11 }, `${s}s`));
+    const total = bins.reduce((a, b) => a + b, 0);
+    stat.innerHTML = `peak <b class="${peak > DB_CAP ? 'bad' : 'good'}">${peak} DB queries/s</b> · total rebuild queries in 60 s: <b>${total}</b> · ${peak > DB_CAP ? '<span class="bad">💥 the DB melts</span>' : '<span class="good">✓ the DB survives</span>'}`;
+  }
+  root.querySelectorAll('input').forEach(i => i.addEventListener('input', draw));
+  draw();
+});
+
+/* ============================================================
+   SIM C — rate limiter (three lanes, same stream)
+   ============================================================ */
+document.querySelectorAll('[data-sim="rate"]').forEach(root => {
+  const svg = root.querySelector('[data-chart]');
+  const stat = root.querySelector('[data-stat]');
+  const LIMIT = 5, WIN = 10, CAP = 5, RATE = 0.5, SPAN = 30;
+  let reqs = [], now = 0, playing = false, raf = null, lastTs = 0;
+
+  function decide(times) {
+    const fixed = [], slide = [], token = [];
+    const counts = {}; const log = []; let tokens = CAP, last = 0;
+    times.forEach(t => {
+      const w = Math.floor(t / WIN); counts[w] = counts[w] || 0;
+      fixed.push(counts[w] < LIMIT ? (counts[w]++, true) : false);
+      while (log.length && log[0] <= t - WIN) log.shift();
+      slide.push(log.length < LIMIT ? (log.push(t), true) : false);
+      tokens = Math.min(CAP, tokens + (t - last) * RATE); last = t;
+      token.push(tokens >= 1 ? (tokens -= 1, true) : false);
+    });
+    return { fixed, slide, token };
+  }
+  function draw() {
+    const times = reqs.slice().sort((a, b) => a - b);
+    const d = decide(times);
+    const W = 800, L = 120, R = 790, x = t => L + (t / SPAN) * (R - L);
+    svg.innerHTML = '';
+    const lanes = [['Fixed window', 'fixed', 40], ['Sliding window', 'slide', 120], ['Token bucket', 'token', 200]];
+    // window boundaries
+    for (let w = 0; w <= SPAN; w += WIN) {
+      svg.appendChild(svgEl('line', { x1: x(w), x2: x(w), y1: 12, y2: 66, stroke: '#fbbf24', 'stroke-dasharray': '4 4' }));
+      if (w < SPAN) svg.appendChild(svgEl('text', { x: x(w) + 3, y: 10, fill: '#fbbf24', 'font-size': 10 }, `fixed window ${w / WIN + 1}`));
+    }
+    lanes.forEach(([name, key, cy]) => {
+      svg.appendChild(svgEl('line', { x1: L, x2: R, y1: cy, y2: cy, stroke: '#2b3855', 'stroke-width': 44, 'stroke-linecap': 'round' }));
+      svg.appendChild(svgEl('text', { x: 8, y: cy + 4, fill: '#eef2f9', 'font-size': 13, 'font-weight': 700 }, name));
+      const ok = d[key].filter(Boolean).length;
+      svg.appendChild(svgEl('text', { x: 8, y: cy + 20, fill: '#94a3b8', 'font-size': 11 }, `${ok} ok · ${times.length - ok} × 429`));
+      times.forEach((t, i) => {
+        const good = d[key][i];
+        // stack requests that are close together so each dot stays visible
+        const dup = times.slice(0, i).filter(u => t - u < 0.6).length;
+        const row = dup % 5;
+        svg.appendChild(svgEl('circle', { cx: x(t), cy: cy - 16 + row * 8, r: 3.8, fill: good ? '#34d399' : '#fb7185', stroke: '#0b1220', 'stroke-width': 1 }));
+      });
+    });
+    // sliding window overlay at now
+    if (now > 0) {
+      svg.appendChild(svgEl('rect', { x: x(Math.max(0, now - WIN)), y: 105, width: x(now) - x(Math.max(0, now - WIN)), height: 30, fill: 'rgba(34,211,238,.08)', stroke: 'rgba(34,211,238,.4)' }));
+      svg.appendChild(svgEl('line', { x1: x(now), x2: x(now), y1: 20, y2: 225, stroke: '#22d3ee', 'stroke-width': 1.5 }));
+      svg.appendChild(svgEl('text', { x: x(now) + 4, y: 236, fill: '#22d3ee', 'font-size': 11 }, `now = ${now.toFixed(1)} s`));
+    }
+    for (let s = 0; s <= SPAN; s += 5) svg.appendChild(svgEl('text', { x: x(s), y: 252, 'text-anchor': 'middle', fill: '#94a3b8', 'font-size': 10 }, `${s}s`));
+    // max accepted in any 1.5 s span (shows boundary burst)
+    const burst = key => { let m = 0; times.forEach((t, i) => { let c = 0; times.forEach((u, j) => { if (u >= t && u < t + 1.5 && d[key][j]) c++; }); m = Math.max(m, c); }); return m; };
+    stat.innerHTML = times.length
+      ? `most requests accepted in any 1.5 s: fixed <b class="${burst('fixed') > LIMIT ? 'bad' : ''}">${burst('fixed')}</b> · sliding <b>${burst('slide')}</b> · token <b>${burst('token')}</b> &nbsp;(limit is ${LIMIT} per ${WIN} s)`
+      : 'Pick a scenario, or press ▶ Live and send requests yourself.';
+  }
+  function stop() { playing = false; cancelAnimationFrame(raf); root.querySelector('[data-act="play"]').textContent = '▶ Live'; }
+  function loop(ts) {
+    if (!playing) return;
+    if (lastTs) now += (ts - lastTs) / 1000 * 2; // 2x speed
+    lastTs = ts;
+    if (now >= SPAN) { now = SPAN; stop(); }
+    draw(); raf = requestAnimationFrame(loop);
+  }
+  const scenario = list => { stop(); reqs = list; now = 0; draw(); };
+  root.querySelector('[data-act="boundary"]').onclick = () => scenario([9.5, 9.6, 9.7, 9.8, 9.9, 10.0, 10.1, 10.2, 10.3, 10.4]);
+  root.querySelector('[data-act="steady"]').onclick = () => scenario(Array.from({ length: 30 }, (_, i) => i + 0.5));
+  root.querySelector('[data-act="idle"]').onclick = () => scenario(Array.from({ length: 12 }, (_, i) => 22 + i * 0.12));
+  root.querySelector('[data-act="clear"]').onclick = () => scenario([]);
+  root.querySelector('[data-act="play"]').onclick = () => {
+    if (playing) { stop(); return; }
+    if (now >= SPAN) { now = 0; reqs = []; }
+    playing = true; lastTs = 0; root.querySelector('[data-act="play"]').textContent = '⏸ Pause';
+    raf = requestAnimationFrame(loop);
+  };
+  const send = n => { if (!playing && now === 0) { root.querySelector('[data-act="play"]').click(); }
+    for (let i = 0; i < n; i++) reqs.push(Math.min(SPAN - 0.01, now + i * 0.05)); draw(); };
+  root.querySelector('[data-act="one"]').onclick = () => send(1);
+  root.querySelector('[data-act="five"]').onclick = () => send(5);
+  window.addEventListener('slidechange', e => { if (!e.detail.contains(root)) stop(); });
+  draw();
+});
+
+/* ============================================================
+   SIM D — gRPC shapes
+   ============================================================ */
+document.querySelectorAll('[data-sim="grpc"]').forEach(root => {
+  const svg = root.querySelector('[data-chart]');
+  const proto = root.querySelector('[data-proto]');
+  const stat = root.querySelector('[data-stat]');
+  const SHAPES = {
+    unary:  { proto: 'rpc GetPost (GetPostRequest) returns (Post);', up: 1, down: 1, mode: 'seq', use: 'one request, one response: get, lookup by id (the common case)' },
+    server: { proto: 'rpc StreamPosts (StreamPostsRequest) returns (stream Post);', up: 1, down: 6, mode: 'seq', use: 'one request, many replies: live updates, long lists, exports' },
+    client: { proto: 'rpc ImportComments (stream CreateCommentRequest) returns (ImportSummary);', up: 6, down: 1, mode: 'seq', use: 'many requests, one reply: uploads, batches' },
+    bidi:   { proto: 'rpc Chat (stream Message) returns (stream Message);', up: 5, down: 5, mode: 'both', use: 'two independent streams: chat, multiplayer sync, collaboration' },
+  };
+  let shape = 'unary', anim = null;
+  function play() {
+    cancelAnimationFrame(anim);
+    const s = SHAPES[shape];
+    proto.innerHTML = highlight(s.proto);
+    stat.innerHTML = `<b>${s.up}</b> client message${s.up > 1 ? 's (stream)' : ''} → · ← <b>${s.down}</b> server message${s.down > 1 ? 's (stream)' : ''} · use for: ${s.use}`;
+    const msgs = [];
+    const GAP = 0.35;
+    if (s.mode === 'seq') {
+      for (let i = 0; i < s.up; i++) msgs.push({ dir: 1, start: i * GAP });
+      const base = (s.up - 1) * GAP + 1.0;
+      for (let i = 0; i < s.down; i++) msgs.push({ dir: -1, start: base + i * GAP });
+    } else {
+      for (let i = 0; i < s.up; i++) msgs.push({ dir: 1, start: i * 0.7 });
+      for (let i = 0; i < s.down; i++) msgs.push({ dir: -1, start: 0.35 + i * 0.7 + 0.2 });
+    }
+    const dur = Math.max(...msgs.map(m => m.start)) + 1.2;
+    const t0 = performance.now();
+    const frame = now => {
+      const t = (now - t0) / 1000;
+      svg.innerHTML = '';
+      const box = (x, label, color) => {
+        svg.appendChild(svgEl('rect', { x, y: 30, width: 150, height: 160, rx: 12, fill: color + '22', stroke: color, 'stroke-width': 1.5 }));
+        svg.appendChild(svgEl('text', { x: x + 75, y: 115, 'text-anchor': 'middle', fill: '#eef2f9', 'font-size': 16, 'font-weight': 700 }, label));
+      };
+      box(20, 'Gateway (stub)', '#34d399'); box(630, 'gRPC service', '#22d3ee');
+      svg.appendChild(svgEl('rect', { x: 180, y: 70, width: 440, height: 80, rx: 8, fill: 'rgba(167,139,250,.06)', stroke: 'rgba(167,139,250,.4)', 'stroke-dasharray': '5 4' }));
+      svg.appendChild(svgEl('text', { x: 400, y: 64, 'text-anchor': 'middle', fill: '#a78bfa', 'font-size': 11 }, 'one HTTP/2 stream on a shared, multiplexed connection'));
+      let doneUp = 0, doneDown = 0;
+      msgs.forEach(m => {
+        const p = (t - m.start) / 0.9;
+        if (p >= 1) { m.dir > 0 ? doneUp++ : doneDown++; return; }
+        if (p < 0) return;
+        const xx = m.dir > 0 ? 180 + p * 440 : 620 - p * 440;
+        const yy = m.dir > 0 ? 95 : 125;
+        svg.appendChild(svgEl('rect', { x: xx - 14, y: yy - 8, width: 28, height: 16, rx: 4, fill: m.dir > 0 ? '#34d399' : '#22d3ee' }));
+      });
+      svg.appendChild(svgEl('text', { x: 400, y: 182, 'text-anchor': 'middle', fill: '#94a3b8', 'font-size': 12 }, `→ ${doneUp}/${s.up} requests   ·   ← ${doneDown}/${s.down} responses${t > dur ? '   ·   stream closed (trailers + status OK)' : ''}`));
+      if (t <= dur) anim = requestAnimationFrame(frame);
+    };
+    anim = requestAnimationFrame(frame);
+  }
+  root.querySelectorAll('[data-shape]').forEach(b => b.onclick = () => {
+    shape = b.dataset.shape; root.querySelectorAll('[data-shape]').forEach(x => x.classList.toggle('on', x === b)); play();
+  });
+  root.querySelector('[data-act="replay"]').onclick = play;
+  window.addEventListener('slidechange', e => { if (e.detail.contains(root)) play(); });
+  play();
+});
+
+updateScore();
+show(0);
+</script>
+</body>
+</html>
