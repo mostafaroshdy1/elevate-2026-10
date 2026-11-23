@@ -1,0 +1,11 @@
+# SQLite database files
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# drizzle-kit output (push snapshots / migrations)
+drizzle/
+
+# build output
+dist/

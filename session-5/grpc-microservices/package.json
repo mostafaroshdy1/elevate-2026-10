@@ -1,0 +1,13 @@
+{
+  "name": "social-grpc-microservices",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm -r --parallel --stream dev",
+    "start": "pnpm -r --parallel --stream start",
+    "db:push": "pnpm --filter @social/users-service --filter @social/posts-service --filter @social/comments-service run db:push",
+    "db:seed": "pnpm --filter @social/users-service --filter @social/posts-service --filter @social/comments-service run db:seed",
+    "db:seed:bulk": "pnpm --filter @social/users-service --filter @social/posts-service --filter @social/comments-service run db:seed:bulk"
+  }
+}

@@ -1,12 +1,20 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { PostService } from "./post.service";
 import type { CreatePostInput, UpdatePostInput } from "./post.entity";
-
+import Redis from "ioredis";
+const redis = new Redis({ db: 6 });
 export class PostController {
   constructor(private readonly service: PostService) {}
 
   async list(_request: FastifyRequest, _reply: FastifyReply) {
-    return this.service.list();
+    const route = _request.url;
+    const cachedData = await redis.get(route);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+    const result = await this.service.list();
+    await redis.set(route, JSON.stringify(result));
+    return result;
   }
 
   async get(

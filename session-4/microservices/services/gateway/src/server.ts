@@ -7,7 +7,7 @@ const POSTS_URL = process.env.POSTS_SERVICE_URL ?? "http://localhost:3002";
 const COMMENTS_URL =
   process.env.COMMENTS_SERVICE_URL ?? "http://localhost:3003";
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: true, http2: true });
 
 interface User {
   id: number;
@@ -144,7 +144,7 @@ app.delete("/comments/:id", (req, reply) => forward(req, reply, COMMENTS_URL));
 
 app.get("/health", async () => ({ ok: true }));
 
-const port = Number(process.env.PORT ?? 3009);
+const port = Number(process.env.PORT ?? 3010);
 const host = process.env.HOST ?? "0.0.0.0";
 
 app

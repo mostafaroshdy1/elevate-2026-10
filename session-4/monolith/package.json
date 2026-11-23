@@ -18,7 +18,8 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "1.0.0-rc.5",
     "drizzle-seed": "1.0.0-rc.5",
-    "fastify": "^5.12.8"
+    "fastify": "^5.12.8",
+    "ioredis": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
