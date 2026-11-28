@@ -1,0 +1,4 @@
+Generated rows: 1000000
+Expected average: 12.5
+Expected minimum: -10
+Expected maximum: 35

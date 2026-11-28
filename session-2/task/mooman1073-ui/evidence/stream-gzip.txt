@@ -1,0 +1,5 @@
+done
+Input: C:\Users\gebruiker\Desktop\Elvator Backend\Node.js_pro\Task2\data\cities-00000.ndjson
+Input size: 78970320 bytes (75.31 MiB)
+Output: C:\Users\gebruiker\Desktop\Elvator Backend\Node.js_pro\Task2\data\cities-00000.ndjson.gz
+Output size: 16585207 bytes (15.82 MiB)

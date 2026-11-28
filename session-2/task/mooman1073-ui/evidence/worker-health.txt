@@ -1,0 +1,8 @@
+Large request: GET /cities/mean-temperature?count=5000000
+Mean response received at: 238.38 ms
+Mean temperature: 12.4963586
+Health 1: sent at 17.94 ms, received at 220.01 ms, response time 202.07 ms, before mean: true
+Health 2: sent at 33.10 ms, received at 221.44 ms, response time 188.34 ms, before mean: true
+Health 3: sent at 49.15 ms, received at 222.68 ms, response time 173.53 ms, before mean: true
+Health 4: sent at 64.70 ms, received at 224.33 ms, response time 159.63 ms, before mean: true
+Health 5: sent at 80.36 ms, received at 226.05 ms, response time 145.69 ms, before mean: true
