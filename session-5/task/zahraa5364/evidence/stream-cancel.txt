@@ -1,0 +1,19 @@
+﻿curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At line:1 char:1
++ curl.exe -N -m 0.8 "http://localhost:3009/posts/export" 2>&1 | Out-Fi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+{"id":1,"authorId":1,"title":"Hello, world!","content":"My first post on this demo social network.","createdAt":"2026-11-05T09:10:00.000Z"}
+{"id":2,"authorId":1,"title":"Why I like Drizzle","content":"Type-safe SQL with a tiny footprint. What's not to like?","createdAt":"2026-11-05T09:20:00.000Z"}
+{"id":3,"authorId":2,"title":"Clean architecture with Fastify","content":"Controller -> Service -> Repository keeps the layers honest.","createdAt":"2026-11-05T09:30:00.000Z"}
+{"id":4,"authorId":3,"title":"Monolith vs microservices","content":"Start with a monolith, split when you outgrow it.","createdAt":"2026-11-05T09:40:00.000Z"}
+{"id":5,"authorId":4,"title":"SQLite for local development","content":"Zero setup and it behaves like production SQL.","createdAt":"2026-11-05T09:50:00.000Z"}
+{"id":6,"authorId":2,"title":"Seeding your database","content":"Deterministic seed data makes demos and tests reliable.","createdAt":"2026-11-05T10:00:00.000Z"}
+  0      0   0      0   0      0      0      0                              0
+100    954   0    954   0      0   1757      0                              0
+100    954   0    954   0      0   1757      0                              0
+100    954   0    954   0      0   1756      0                              0

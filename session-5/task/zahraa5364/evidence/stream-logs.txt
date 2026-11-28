@@ -1,0 +1,4 @@
+﻿Request ID test: session5-test-123
+Gateway: GET /health, statusCode 200
+Client streaming: ImportComments, messages 10000, code 0
+Request ID propagated from gateway to comments-service.
