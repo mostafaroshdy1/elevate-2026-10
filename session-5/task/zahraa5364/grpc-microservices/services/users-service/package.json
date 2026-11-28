@@ -1,0 +1,28 @@
+{
+  "name": "@social/users-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:seed:bulk": "tsx src/db/seed-bulk.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.7",
+    "@grpc/proto-loader": "^0.8.1",
+    "@libsql/client": "^0.18.0",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "1.0.0-rc.5",
+    "drizzle-seed": "1.0.0-rc.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "drizzle-kit": "1.0.0-rc.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
